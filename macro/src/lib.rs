@@ -7,18 +7,18 @@ mod derive;
 mod utils;
 
 /// Proc. macro to derive [`EnumRef`] trait for the Rust `enum`.
-/// 
+///
 /// This generates a new `enum` that mirrors all variants of the
 /// original `enum` type but wraps all variant field in a shared
 /// reference.
 /// Furthermore it implement the [`EnumRef`] trait for the original
 /// `enum` in order to make the generated `enum` accessible.
-/// 
+///
 /// # Example
-/// 
+///
 /// ```
 /// use enum_ref::EnumRef;
-/// 
+///
 /// #[derive(EnumRef)]
 /// #[repr(u8)] // Rust requires this for `B = 42`
 /// enum Test {
@@ -29,13 +29,21 @@ mod utils;
 ///     E { a: i32 },
 ///     F { a: i32, b: i64 },
 /// }
-/// 
+///
 /// // Access and name the generated `enum` as follows:
 /// type TestRef<'a> = <Test as EnumRef>::Ref<'a>;
+///
+/// // Creates reference wrappers of `enum` instances as follows:
+/// let test = Test::C(42);
+/// let test_ref: TestRef = <Test as EnumRef>::as_ref(&test);
+/// match (&test, test_ref) {
+///     (Test::C(a0), TestRef::C(a1)) => assert_eq!(a0, a1),
+///     _ => panic!("something wen't wrong ..."),
+/// }
 /// ```
-/// 
+///
 /// The `#[derive(EnumRef)]` in the above example will generate roughly the following Rust code.
-/// 
+///
 /// ```
 /// # #[repr(u8)] // Rust requires this for `B = 42`
 /// # enum Test {
@@ -63,7 +71,7 @@ mod utils;
 ///             b: &'__enum_ref_lt i64,
 ///         },
 ///     }
-/// 
+///
 ///     impl ::enum_ref::EnumRef for Test {
 ///         type Ref<'__enum_ref_lt> where Self: '__enum_ref_lt =
 ///                 TestRef<'__enum_ref_lt> where Self: '__enum_ref_lt;
@@ -88,18 +96,19 @@ pub fn enum_ref(input: TokenStream) -> TokenStream {
 }
 
 /// Proc. macro to derive [`EnumMut`] trait for the Rust `enum`.
-/// 
+///
 /// This generates a new `enum` that mirrors all variants of the
 /// original `enum` type but wraps all variant field in an exclusive
 /// reference.
 /// Furthermore it implement the [`EnumMut`] trait for the original
 /// `enum` in order to make the generated `enum` accessible.
-/// 
+///
 /// # Example
-/// 
+///
 /// ```
 /// use enum_ref::EnumMut;
-/// 
+///
+/// # #[derive(Clone)]
 /// #[derive(EnumMut)]
 /// #[repr(u8)] // Rust requires this for `B = 42`
 /// enum Test {
@@ -110,13 +119,22 @@ pub fn enum_ref(input: TokenStream) -> TokenStream {
 ///     E { a: i32 },
 ///     F { a: i32, b: i64 },
 /// }
-/// 
+///
 /// // Access and name the generated `enum` as follows:
 /// type TestMut<'a> = <Test as EnumMut>::Mut<'a>;
+///
+/// // Creates reference wrappers of `enum` instances as follows:
+/// let mut test0 = Test::C(42);
+/// let mut test1 = test0.clone();
+/// let test_ref: TestMut = <Test as EnumMut>::as_mut(&mut test0);
+/// match (&mut test1, test_ref) {
+///     (Test::C(a0), TestMut::C(a1)) => assert_eq!(a0, a1),
+///     _ => panic!("something wen't wrong ..."),
+/// }
 /// ```
-/// 
+///
 /// The `#[derive(EnumMut)]` in the above example will generate roughly the following Rust code.
-/// 
+///
 /// ```
 /// # #[repr(u8)] // Rust requires this for `B = 42`
 /// # enum Test {
@@ -144,7 +162,7 @@ pub fn enum_ref(input: TokenStream) -> TokenStream {
 ///             b: &'__enum_ref_lt mut i64,
 ///         },
 ///     }
-/// 
+///
 ///     impl ::enum_ref::EnumMut for Test {
 ///         type Mut<'__enum_ref_lt> where Self: '__enum_ref_lt =
 ///                 TestMut<'__enum_ref_lt> where Self: '__enum_ref_lt;
