@@ -1,3 +1,14 @@
+| Continuous Integration |  Documentation   |      Crates.io       |
+|:----------------------:|:----------------:|:--------------------:|
+| [![ci][1]][2]          | [![docs][3]][4] | [![crates][5]][6]  |
+
+[1]: https://github.com/Robbepop/enum-ref/actions/workflows/rust.yml/badge.svg
+[2]: https://github.com/Robbepop/enum-ref/actions/workflows/rust.yml
+[3]: https://docs.rs/enum-ref/badge.svg
+[4]: https://docs.rs/enum-ref
+[5]: https://img.shields.io/crates/v/enum-ref.svg
+[6]: https://crates.io/crates/enum-ref
+
 # `#[derive(EnumRef)]` and `#[derive(EnumMut)]`
 
 This crate provides the `#[derive(EnumRef)]` and `#[derive(EnumMut)]` proc. macros
